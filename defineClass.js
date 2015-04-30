@@ -1,4 +1,10 @@
 "use strict"
+
+function isinstance (o, c) {
+	var types = o._type;
+	return c in types;
+}
+
 function _super (klass, scope) {
 	return {
 		init: klass._super.prototype.init.bind(scope)
@@ -8,8 +14,9 @@ function _super (klass, scope) {
 function defineClass (superClass, props) {
 	var events = props.events ? props.events : null;
 	var fn = function () {
+		var types = []
 		this._type = fn;
-		if (events !== null && events["beforeInit"] !== null) events["beforeInit"]();
+		if (events !== null && typeof events["beforeInit"] === "function") events["beforeInit"]();
 		this.init.apply(this, arguments);
 	};
 	
@@ -20,11 +27,24 @@ function defineClass (superClass, props) {
 		fn._super = null;
 	}
 	
-	fn.prototype.constructor = fn;
+	Object.defineProperties(fn.prototype, {
+		constructor: {
+			configurable: false,
+			enumerable: false,
+			writeable: false,
+			value: fn
+		}
+	});
 	fn.prototype.init = function () {};
 		 
 	for (var key in props) {
-		fn.prototype[key] = props[key];
+		
+		Object.defineProperty(fn.prototype, key, {
+			configurable: true,
+			enumerable: true,
+			writeable: true,
+			value: props[key]
+		});
 	}
 	
 	return fn;
