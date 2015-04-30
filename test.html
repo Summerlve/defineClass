@@ -7,7 +7,7 @@
 	<script src="defineClass.js"></script>
 	<script>
 		"use strict"
-		var People = new defineClass(null, {
+		var People = defineClass(null, {
 			init: function (name, age) {
 				this.name = name;
 				this.age = age;
@@ -17,7 +17,7 @@
 			}
 		})
 		
-		var Student = new defineClass(People, {
+		var Student = defineClass(People, {
 			init: function (name, age, stuId) {		
 				_super(Student, this).init(name, age);
 				this.stuId = stuId;
@@ -27,7 +27,7 @@
 			}
 		});
 				
-		var thr = new defineClass(Student, {
+		var thr = defineClass(Student, {
 			init: function (name, age, stuId, num) {
 				_super(thr, this).init(name, age, stuId);
 				this.num = num;
