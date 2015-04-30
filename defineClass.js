@@ -1,6 +1,6 @@
 "use strict";
 
-// 寻找父类，再返回父类构造函数bind了子类this的wrapper
+// 返回父类的构造函数
 function _super (klass, scope) {
 	return {
 		init: klass._super.prototype.init.bind(scope)
@@ -8,6 +8,7 @@ function _super (klass, scope) {
 }
 
 function defineClass (superClass, props) {
+	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass's type is worng");
 	var klass = function () {
 		// type 不能删除，不能更改，可以枚举
 		Object.defineProperty(this, "type", {
@@ -21,7 +22,7 @@ function defineClass (superClass, props) {
 	};
 	
 	// 判断是否有需要继承
-	if (superClass !== null) {
+	if (typeof superClass === "function") {
 		klass.prototype = new superClass();
 		Object.defineProperty(klass, "_super", {
 			configurable: false,
@@ -47,7 +48,7 @@ function defineClass (superClass, props) {
 	
 	
 	for (var key in props) {
-		// init 不可枚举
+		// init 不可枚举，不能删除，不能更改
 		if (key === "init") {
 			Object.defineProperty(klass.prototype, key, {
 				configurable: false,

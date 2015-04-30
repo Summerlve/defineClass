@@ -1,9 +1,4 @@
 "use strict";
-var unittest = function () {
-	this.passed = 0;
-	this.failed = 0;
-};
-
 var EqualsError = function (message) {
 	this.name = "EqualsError";
 	this.message = message;
@@ -41,20 +36,26 @@ function assertErrorType (errorType, fn){
 	}
 }
 
+var unittest = function () {
+	this.passed = 0;
+	this.failed = 0;
+	this.save = [];
+};
+
 unittest.prototype = {
 	constructor: unittest,
-	save: [],
+	
 	addTestCase: function (name, fn) {
 		this.save.push({
 			name: name,
 			fn: fn
 		});
 	},
-	runTestCase: function (name, fn) {
+	runTestCase: function (index ,name, fn) {
 		var result = document.createElement("div");
 		result.style.fontFamily = "Monaco";
 		result.style.fontSize = "18px";
-		result.appendChild(document.createTextNode(name));
+		result.appendChild(document.createTextNode(index + ": " + name));
 		
 		try {
 			fn();
@@ -73,7 +74,7 @@ unittest.prototype = {
 		var fragment = document.createDocumentFragment();
 		
 		this.save.forEach(function (cur, index, arr) {
-			fragment.appendChild(this.runTestCase(cur.name, cur.fn));
+			fragment.appendChild(this.runTestCase(index, cur.name, cur.fn));
 		}, this);
 		document.body.appendChild(fragment);
 
