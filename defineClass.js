@@ -39,6 +39,7 @@ function defineClass (superClass, props) {
 		});
 	}
 	
+	// 将原型的constructor指回构造函数
 	Object.defineProperty(klass.prototype, "constructor", {
 		configurable: false,
 		enumerable: false,
@@ -46,7 +47,7 @@ function defineClass (superClass, props) {
 		value: klass
 	});
 	
-	
+	// 讲方法导入klass的原型
 	for (var key in props) {
 		// init 不可枚举，不能删除，不能更改
 		if (key === "init") {
@@ -56,14 +57,14 @@ function defineClass (superClass, props) {
 				writeable: false,
 				value: props[key]
 			});
-			continue ;
+		} else {
+			Object.defineProperty(klass.prototype, key, {
+				configurable: false,
+				enumerable: true,
+				writeable: false,
+				value: props[key]
+			});
 		}
-		Object.defineProperty(klass.prototype, key, {
-			configurable: false,
-			enumerable: true,
-			writeable: false,
-			value: props[key]
-		});
 	}
 	
 	return klass;

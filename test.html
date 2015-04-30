@@ -10,6 +10,7 @@
 	<script>
 		"use strict";
 		var test = new unittest();
+		
 		test.addTestCase("define class", function () {
 			var People = defineClass(null, {
 				init: function (name, age) {
@@ -58,9 +59,8 @@
 			}	
 			
 			console.log(Object.prototype.toString.call(People));
-		});
-		
-		test.addTestCase("write something", function () {
+		})
+		.addTestCase("write something", function () {
 			var Person = defineClass(null, {
 				init: function (name, age) {
 					this.name = name;
@@ -69,15 +69,15 @@
 			});
 			var p = new Person("zhanghao", 222);
 			console.log(p);
-		});
-		test.addTestCase("Stack must be ok", function () {
+		})
+		.addTestCase("Stack must be ok", function () {
 			var stack = new Stack();
 			stack.push(1).push(2).push(3);
 			stack.foreach(function (item) {
 				console.log(item); // 3 2 1
 			});
-		});
-		test.addTestCase("enum", function () {
+		})
+		.addTestCase("enum", function () {
 			var People = defineClass(null, {
 				init: function (name, age) {
 					this.name = name;
@@ -95,6 +95,7 @@
 				console.log(key);
 			}
 		});
+		
 		test.run();
 	</script>
 </body>

@@ -50,6 +50,8 @@ unittest.prototype = {
 			name: name,
 			fn: fn
 		});
+		
+		return this;
 	},
 	runTestCase: function (index ,name, fn) {
 		var result = document.createElement("div");
