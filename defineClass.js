@@ -15,7 +15,7 @@ function defineClass (superClass, props) {
 	var events = props.events ? props.events : null;
 	var fn = function () {
 		var types = []
-		this._type = fn;
+		this.type = fn;
 		if (events !== null && typeof events["beforeInit"] === "function") events["beforeInit"]();
 		this.init.apply(this, arguments);
 	};
@@ -35,12 +35,12 @@ function defineClass (superClass, props) {
 			value: fn
 		}
 	});
+	
 	fn.prototype.init = function () {};
 		 
-	for (var key in props) {
-		
+	for (var key in props) {		
 		Object.defineProperty(fn.prototype, key, {
-			configurable: true,
+			configurable: false,
 			enumerable: true,
 			writeable: true,
 			value: props[key]
