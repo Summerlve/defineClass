@@ -5,7 +5,6 @@
 </head>
 <body>
 	<script src="defineClass.js"></script>
-	<script src="CollectionR.js"></script>
 	<script src="unittest.js"></script>
 	<script>
 		"use strict";
@@ -37,28 +36,12 @@
 			
 			var s = new Student("zhanghao", 22, 12261018);
 			s.say();
-			
-					
-			var Thr = defineClass(Student, {
-				init: function (name, age, stuId, score) {
-					_super(Thr, this).init(name, age, stuId);
-					this.score = score;
-				},
-				say: function () {
-					console.log(this.name + " " + this.age + " " + this.stuId + " " + this.score);
-				}
-			});
-			
-			var t = new Thr("zhanghao", 22, 1226, 123123);
-			t.say();
-			
-			console.log("枚举");
-			
-			for (var key in t) {
-				console.log(key);
-			}	
-			
-			console.log(Object.prototype.toString.call(People));
+		
+			var haha = defineClass(null, {});
+			console.log(s instanceof Student);
+			console.log(s instanceof People);
+			console.log(s.type === Student);
+			console.log(s.type === People);
 		})
 		.addTestCase("write something", function () {
 			var Person = defineClass(null, {
@@ -94,6 +77,29 @@
 			for (var key in p) {
 				console.log(key);
 			}
+		})
+		.addTestCase("stack and queue", function () {
+			var s = new Stack();
+			s.push(1).push(2).push(3);
+			s.foreach(function (item) {
+				console.log(s.pop());
+			});
+			
+//			var sasf = Stack();
+			console.log(s instanceof Stack);
+		})
+		.addTestCase("just test", function () {
+			var o = {
+				init: function adf () {
+					
+				}
+			};
+			console.log(o);
+			
+			var test = function asdf() {
+				
+			};
+			console.log(test);
 		});
 		
 		test.run();
