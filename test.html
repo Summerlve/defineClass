@@ -88,18 +88,25 @@
 //			var sasf = Stack();
 			console.log(s instanceof Stack);
 		})
-		.addTestCase("just test", function () {
-			var o = {
-				init: function adf () {
+		.addTestCase("safty constructor function", function () {
+			var People = defineClass(null, {
+				init: function () {
 					
+				} 
+			})
+			.classProps({
+				sum: function () {
+					return 3;
 				}
-			};
-			console.log(o);
+			});
 			
-			var test = function asdf() {
-				
-			};
-			console.log(test);
+			
+			
+			for (var key in People) {
+				console.log(key);
+			}
+			console.log(People.sum());
+			
 		});
 		
 		test.run();

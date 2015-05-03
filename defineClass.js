@@ -7,8 +7,6 @@ function _super (klass, scope) {
 	}
 }
 
-function classMethod () {}
-
 function defineClass (superClass, props) {
 	// 继承只支持单重继承，单继承
 	if (superClass !== null && superClass._super !== null) throw new Error("继承只支持单重继承，单继承");
@@ -16,8 +14,10 @@ function defineClass (superClass, props) {
 	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass is opptional, if the class dont inherit any class, must choose null here");
 	// props必须是obj
 	if (!(props instanceof Object)) throw new TypeError("props must be a obj");
+	
 	var klass = function () {
-//		if (!(this instanceof kalss)) throw new Error("dont forget the keyword 'new'");
+		// 安全的构造函数
+		if (!(this instanceof klass)) return new klass(arguments);
 		// type 不能删除，不能更改，可以枚举
 		Object.defineProperty(this, "type", {
 			configurable: false,
@@ -74,6 +74,28 @@ function defineClass (superClass, props) {
 			});
 		}
 	}
+	
+	// 添加类属性和方法
+	Object.defineProperty(klass, "classProps", {
+		configurable: false,
+		enumerable: true,
+		writable: false,
+		value: function (props) {
+			// props必须是obj
+			if (!(props instanceof Object)) throw new TypeError("props must be a obj");
+			for (var key in props) {
+				Object.defineProperty(this, key, {
+					configurable: false,
+					enumerable: true,
+					writable: false,
+					value: props[key]
+				});
+			}
+			
+			return this;
+		}
+	});
+
 	
 	return klass;
 }
