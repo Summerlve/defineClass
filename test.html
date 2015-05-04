@@ -5,7 +5,6 @@
 </head>
 <body>
 	<script src="defineClass.js"></script>
-	<script src="unittest.js"></script>
 	<script>
 		"use strict";
 		var test = new unittest();
@@ -90,26 +89,30 @@
 		})
 		.addTestCase("safty constructor function", function () {
 			var People = defineClass(null, {
-				init: function () {
-					
-				} 
+				init: function (name) {
+					this.name = name;
+				},
+				say: function () {
+					return "name: " + this.name;
+				}
 			})
 			.classProps({
-				sum: function () {
-					return 3;
+				getClassName: function () {
+					return this.name;
 				}
 			});
 			
-			
+			var p = new People("zhanghao");
+			console.log(p.say());
 			
 			for (var key in People) {
 				console.log(key);
 			}
-			console.log(People.sum());
-			
+			console.log(People.getClassName());
 		});
-		
 		test.run();
+		
+		
 	</script>
 </body>
 </html>
