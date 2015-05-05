@@ -109,9 +109,7 @@ function defineClass (superClass, props) {
 
 
 // unittest
-function log (o) {
-	console.log(o);
-}
+var log = console.log.bind(console);
 
 // 自定义的错误类型
 var EqualsError = defineClass(Error, {
