@@ -65,7 +65,7 @@
 					this.stuId = stuId;
 				},
 				say: function () {
-					return "I'm a student, name is " + this.name + ", age is " + this.age + ", sex is " + this.age + ", stuId is " + this.stuId;
+					return "I'm a student, name is " + this.name + ", age is " + this.age + ", sex is " + this.sex + ", stuId is " + this.stuId;
 				}
 			});
 			
@@ -77,6 +77,17 @@
 					
 				}
 			});
+			
+			log(zh._super);
+			
+			var zh2 = defineClass(zh, {
+				init: function () {
+					
+				}
+			});
+			
+			var z = new zh();
+			log(z.toString);
 		});
 		test.run();
 		
