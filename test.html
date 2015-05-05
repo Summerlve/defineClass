@@ -8,109 +8,80 @@
 	<script>
 		"use strict";
 		var test = new unittest();
-		
-		test.addTestCase("define class", function () {
+		//unittest本身的测试
+		test.addTestCase("every error must be ok", function () {
+			assertEquals(1, 1);
+			assertTrue(true);	
+		})
+		.addTestCase("defineClass must be ok", function () {
 			var People = defineClass(null, {
-				init: function (name, age) {
+				init: function (name, age, sex) {
 					this.name = name;
 					this.age = age;
-				},
-				say: function () {
-					console.log(this.name + " " + this.age);
+					this.sex = sex;
 				}
 			});
+			assertEquals(People._super, null);
+			for (var key in People) {
+				log(key);
+			}
 			
-			var p = new People("zhanghao", 22);
-			p.say();
+			var p = new People("zhanghao", 22, "male");
+			log(p);
+			for (var key in p) {
+				log(key);
+			}
+			assertTrue(p.type === People);	
+		})
+		.addTestCase("props must be obj and must have init function, superClass must be null or class", function () {
+			var People = defineClass(null, {
+				init: function () {
+					
+				}
+			});
+			var p = new People(); 
+			log(p.type);
+			log(Object.prototype.toString.call(p.type));
+		})
+		.addTestCase("inherit must be ok", function () {
+			var People = defineClass(null, {
+					init: function (name, age, sex) {
+						this.name = name;
+						this.age = age;
+						this.sex = sex;
+					},
+					say: function () {
+						return "I'm a people, name is " + this.name + ", age is " + this.age + ", sex is " + this.sex;
+					}
+				} 
+			);
+			
+			var p = new People("zhanghao", 22, "male");
+			log(p.say());
 			
 			var Student = defineClass(People, {
-				init: function (name, age, stuId) {		
-					_super(Student, this).init(name, age);
+				init: function (name, age, sex, stuId) {
+					_super(Student, this).init(name, age, sex);
 					this.stuId = stuId;
 				},
 				say: function () {
-					console.log(this.name + " " + this.age + " " + this.stuId);
+					return "I'm a student, name is " + this.name + ", age is " + this.age + ", sex is " + this.age + ", stuId is " + this.stuId;
 				}
 			});
 			
-			var s = new Student("zhanghao", 22, 12261018);
-			s.say();
-		
-			var haha = defineClass(null, {});
-			console.log(s instanceof Student);
-			console.log(s instanceof People);
-			console.log(s.type === Student);
-			console.log(s.type === People);
-		})
-		.addTestCase("write something", function () {
-			var Person = defineClass(null, {
-				init: function (name, age) {
-					this.name = name;
-					this.age = age;
+			var s = new Student("xxx", 22, "male", "122222");
+			log(s.say());
+			
+			var zh = defineClass(Object, {
+				init: function () {
+					
 				}
 			});
-			var p = new Person("zhanghao", 222);
-			console.log(p);
-		})
-		.addTestCase("Stack must be ok", function () {
-			var stack = new Stack();
-			stack.push(1).push(2).push(3);
-			stack.foreach(function (item) {
-				console.log(item); // 3 2 1
-			});
-		})
-		.addTestCase("enum", function () {
-			var People = defineClass(null, {
-				init: function (name, age) {
-					this.name = name;
-					this.age = age;
-				},
-				say: function () {
-					console.log(this.name + " " + this.age);
-				}
-			});
-			
-			var p = new People("zhanghao", 22);
-			p.say();
-			
-			for (var key in p) {
-				console.log(key);
-			}
-		})
-		.addTestCase("stack and queue", function () {
-			var s = new Stack();
-			s.push(1).push(2).push(3);
-			s.foreach(function (item) {
-				console.log(s.pop());
-			});
-			
-//			var sasf = Stack();
-			console.log(s instanceof Stack);
-		})
-		.addTestCase("safty constructor function", function () {
-			var People = defineClass(null, {
-				init: function (name) {
-					this.name = name;
-				},
-				say: function () {
-					return "name: " + this.name;
-				}
-			})
-			.classProps({
-				getClassName: function () {
-					return this.name;
-				}
-			});
-			
-			var p = new People("zhanghao");
-			console.log(p.say());
-			
-			for (var key in People) {
-				console.log(key);
-			}
-			console.log(People.getClassName());
 		});
+		
 		test.run();
+		
+		
 		
 		
 	</script>

@@ -1,4 +1,11 @@
 "use strict";
+// 通用函数
+var types = ["Undefined", "Null", "String", "Boolean", "Number", "Object", "Function", "Array"];
+types.forEach(function (value) {
+	window["is" + value] = new Function("o", "return Object.prototype.toString.call(o) === '[object " + value + "]'");
+});
+
+// defineClass
 // 返回父类的构造函数
 function _super (klass, scope) {
 	return {
@@ -7,16 +14,18 @@ function _super (klass, scope) {
 }
 
 function defineClass (superClass, props) {
-	// 继承只支持单重继承，单继承
-	if (superClass !== null && superClass._super !== null) throw new Error("继承只支持单重继承，单继承");
+	// 在这个体系内，继承只支持单重继承，单继承，不包括自带的类。
+	if (superClass !== null && superClass._super) throw new Error("继承只支持单重继承，单继承");
 	// superClass为可选项，值为null或者一个类
-	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass is opptional, if the class dont inherit any class, must choose null here");
+	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass is opptional, if the class dont inherit any superclass, must choose null here");
 	// props必须是obj
-	if (!(props instanceof Object)) throw new TypeError("props must be a obj");
+	if (!isObject(props)) throw new TypeError("props must be a obj");
+	// props必须包含init函数
+	if (isObject(props) && isUndefined(props.init)) throw new Error("must have a init function"); 
 	
 	function klass () {
 		// 安全的构造函数
-		if (!(this instanceof klass)) throw new Error("use 'new' keyword");
+		if (!(this instanceof klass)) throw new Error("use 'new' keyword to create instance");
 		// type 不能删除，不能更改，可以枚举
 		Object.defineProperty(this, "type", {
 			configurable: false,
@@ -77,7 +86,7 @@ function defineClass (superClass, props) {
 	// 添加类属性和方法
 	Object.defineProperty(klass, "classProps", {
 		configurable: false,
-		enumerable: true,
+		enumerable: false,
 		writable: false,
 		value: function (props) {
 			// props必须是obj
@@ -94,14 +103,17 @@ function defineClass (superClass, props) {
 			return this;
 		}
 	});
-
 	
 	return klass;
 }
 
 
 // unittest
-console.log(Error._super);
+function log (o) {
+	console.log(o);
+}
+
+// 自定义的错误类型
 var EqualsError = defineClass(Error, {
 	init: function (message) {
 		this.name = "EqualsError";
@@ -109,28 +121,30 @@ var EqualsError = defineClass(Error, {
 	}
 });
 
-var BooleanError = function (message) {
-	this.name = "BooleanError";
-	this.message = message;
-};
-BooleanError.prototype = new Error();
-BooleanError.prototype.constructor = BooleanError;
+var BooleanError = defineClass(Error, {
+	init: function (message) {
+		this.name = "BooleanError";
+		this.message = message;
+	}
+});
 
-var ErrorTypeError = function (message) {
-	this.name = "ErrorTypeError";
-	this.message = message;
-};
-ErrorTypeError.prototype = new Error();
-ErrorTypeError.prototype.constructor = ErrorTypeError;
+var ErrorTypeError = defineClass(Error, {
+	init: function (message) {
+		this.name = "ErrorTypeError";
+		this.message = message;
+	}
+}); 
 
+// 断言
 function assertTrue (a) {
-	if (a !== true) throw new BooleanError("Isn't true");
+	if (a !== true) throw new BooleanError(a + "(" + typeof a + ")" + " isn't true");
 }
 
 function assertEquals (a, b) {
-	if (a !== b) throw new EqualsError(a + " isn't equal to " + b)
+	if (a !== b) throw new EqualsError(a + "(" + typeof a + ")" + " isn't equals to " + b + "(" + typeof b + ")");
 };
 
+// assertErrorType为草稿，待议。
 function assertErrorType (errorType, fn){
 	try {
 		fn();
@@ -139,16 +153,15 @@ function assertErrorType (errorType, fn){
 	}
 }
 
-function unittest () {
-	this.passed = 0;
-	this.failed = 0;
-	this.save = [];
-};
-
-unittest.prototype = {
-	constructor: unittest,
-	
+// 单元测试类
+var unittest = defineClass(null, {
+	init: function () {
+		this.passed = 0;
+		this.failed = 0;
+		this.save = [];
+	},
 	addTestCase: function (name, fn) {
+		if (!isFunction(fn)) throw new TypeError("fn must be a function");
 		this.save.push({
 			name: name,
 			fn: fn
@@ -168,7 +181,7 @@ unittest.prototype = {
 			++ this.passed;
 		} catch (error) {
 			result.style.color = "red";
-			result.appendChild(document.createTextNode(" (failed) {" + error.name + " : " + error.message + "}"));
+			result.appendChild(document.createTextNode(" (failed) {" + error.name + ": " + error.message + "}"));
 			++ this.failed;
 		}
 		
@@ -220,8 +233,7 @@ unittest.prototype = {
 		finallyResults.appendChild(fragment);
 		document.body.appendChild(finallyResults);
 	}
-};
-
+});
 
 // 简单的Stack和Queue实现
 var Node = defineClass(null, {
