@@ -10,7 +10,7 @@ types.forEach(function (value) {
 function _super (klass, scope) {
 	return {
 		init: klass._super.prototype.init.bind(scope)
-	}
+	};
 }
 
 function defineClass (superClass, props) {
@@ -280,7 +280,7 @@ var Queue = defineClass(null, {
 	init: function () {
 		this.first = null;
 		this.last = null;
-		this.N = 0
+		this.N = 0;
 	},
 	size: function () {
 		return this.N;
