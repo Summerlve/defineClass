@@ -1,7 +1,7 @@
 ### Just A Toy
 ---
 ```
-var People = defineClass(null, {
+var People = defineClass("People", null, {
 	init: function (name, age) {
 		this.name = name;
 		this.age = age;
@@ -14,7 +14,7 @@ var People = defineClass(null, {
 var p = new People("zhanghao", 22);
 p.say();
 
-var Student = defineClass(People, {
+var Student = defineClass("Student", People, {
 	init: function (name, age, stuId) {		
 	    // the _super function will return a object include current class's superClass's constructor function, just like what's in python.
 		_super(Student, this).init(name, age);

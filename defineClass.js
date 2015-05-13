@@ -6,7 +6,7 @@ types.forEach(function (value) {
 });
 
 // defineClass
-// 返回父类的构造函数
+// 返回父类的构造函数，用于继承时借用构造函数
 function _super (klass, that) {
 	return {
 		init: klass._super.prototype.init.bind(that)
@@ -14,6 +14,8 @@ function _super (klass, that) {
 }
 
 function defineClass (className, superClass, props) {
+	// className必须是String
+	if (!isString(className)) throw new TypeError("className must be string");
 	// 在这个体系内，继承只支持单重继承，单继承，不包括自带的类。
 	if (superClass !== null && superClass._super) throw new Error("继承只支持单重继承，单继承");
 	// superClass为可选项，值为null或者一个类(function)
@@ -25,52 +27,38 @@ function defineClass (className, superClass, props) {
 	
 	// 邪恶的eval，等同于下面注释的函数。
 	var klassString = [];
-	klassString.push("(function ");
-	klassString.push(className);
-	klassString.push(" () {\r\n");
-	klassString.push("// 安全的构造函数\r\n");
-	klassString.push("if (!(this instanceof klass)) throw new Error(\"use 'new' keyword to create instance\");\r\n");
-	klassString.push("// type 不能删除，不能更改，可以枚举\r\n");
-	klassString.push("Object.defineProperty(this, \"type\", {");
-	klassString.push("configurable: false,");
-	klassString.push("enumerable: true,");
-	klassString.push("writable: false,");
-	klassString.push("value: " + className);
-	klassString.push("});\r\n");
-	klassString.push("this.init.apply(this, arguments);})");
-	var klass = eval(klassString.join(""));
+	klassString.push("(function " + className +" () {");
+	klassString.push("if (!(this instanceof klass)) throw new Error(\"use 'new' keyword to create instance\");");
+	klassString.push("Object.defineProperty(this, 'type', {configurable: false,enumerable: true,writable: false,value: " + className + "});");
+	klassString.push("this.init.apply(this, arguments);");
+	klassString.push("})");
+	var klass = eval(klassString.join("\r\n"));
 	
-//	function klass () {
-//		// 安全的构造函数
-//		if (!(this instanceof klass)) throw new Error("use 'new' keyword to create instance");
-//		// type 不能删除，不能更改，可以枚举
-//		Object.defineProperty(this, "type", {
-//			configurable: false,
-//			enumerable: true,
-//			writable: false,
-//			value: klass
-//		});
-//		
-//		this.init.apply(this, arguments);
-//	}
-	
-	// 判断是否有需要继承
-	if (isFunction(superClass)) {
-		klass.prototype = new superClass();
-		Object.defineProperty(klass, "_super", {
+	/*	
+	function klass () {
+		// 安全的构造函数
+		if (!(this instanceof klass)) throw new Error("use 'new' keyword to create instance");
+		// type 不能删除，不能更改，可以枚举
+		Object.defineProperty(this, "type", {
 			configurable: false,
-			enumerable: false,
+			enumerable: true,
 			writable: false,
-			value: superClass
+			value: klass
 		});
-	} else {
-		Object.defineProperty(klass, "_super", {
-			configurable: false,
-			enumerable: false,
-			writable: false,
-			value: null
-		});
+		
+		this.init.apply(this, arguments);
 	}
+	*/
+	
+	// 判断是否有需要继承，使用：借用构造函数和原型链继承。
+	var needInherit = isFunction(superClass);
+	klass.prototype = needInherit ? new superClass() : klass.prototype;
+	Object.defineProperty(klass, "_super", {
+		configurable: false,
+		enumerable: false,
+		writable: false,
+		value: superClass
+	});
 	
 	// 将原型的constructor指回构造函数
 	Object.defineProperty(klass.prototype, "constructor", {
@@ -83,21 +71,12 @@ function defineClass (className, superClass, props) {
 	// 将方法导入klass的原型
 	for (var key in props) {
 		// init 不可枚举，不能删除，不能更改
-		if (key === "init") {
-			Object.defineProperty(klass.prototype, key, {
-				configurable: false,
-				enumerable: false,
-				writeable: false,
-				value: props[key]
-			});
-		} else {
-			Object.defineProperty(klass.prototype, key, {
-				configurable: false,
-				enumerable: true,
-				writeable: false,
-				value: props[key]
-			});
-		}
+		Object.defineProperty(klass.prototype, key, {
+			configurable: false,
+			enumerable: key === "init" ? false : true,
+			writeable: false,
+			value: props[key]
+		});
 	}
 	
 	// 添加类属性和方法
@@ -112,7 +91,7 @@ function defineClass (className, superClass, props) {
 				Object.defineProperty(this, key, {
 					configurable: false,
 					enumerable: true,
-					writable: false,
+					writable: isFunction(props[key]) ? false : true,
 					value: props[key]
 				});
 			}
@@ -239,14 +218,15 @@ var unittest = defineClass("unittest", null, {
 		fragment.appendChild(div);
 		
 		var end = Date.parse(new Date());
-		var range = (end - start) / 1000;
+		var range = end - start;
 		div = document.createElement("div");
 		div.style.color = "red";
-		div.appendChild(document.createTextNode("Time: " + range + "s"));
+		div.appendChild(document.createTextNode("Time: " + range + "ms"));
 		fragment.appendChild(div);
 		
 		finallyResults.appendChild(fragment);
 		document.body.appendChild(finallyResults);
+		this.save = null;
 	}
 });
 

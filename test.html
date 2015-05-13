@@ -83,8 +83,14 @@
 				}
 			})
 			.classProps({
-				va: 1
+				va: 1,
+				fn: function () {
+					
+				}
 			});
+			
+			People.va = 2;
+			
 			log(new People("zhanghao", 22).say());
 			log(People.va);
 			for (var key in People) {
@@ -97,11 +103,19 @@
 			log(new People("zhanghao", 22).type);
 			log(People.name);
 			log(new People("zhanghao", 22).type);
+		})
+		.addTestCase("className must be string", function () {
+			var People = defineClass("People", null, {
+				init: function () {
+					
+				}
+			});
+			log(People.name);	
 		});
 		test.run();
+		log(test.save);
 		
-
-
+		
 	</script>
 </body>
 </html>
