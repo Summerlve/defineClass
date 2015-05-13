@@ -53,22 +53,45 @@ function defineClass (className, superClass, props) {
 	// 判断是否有需要继承，使用：借用构造函数和原型链继承。
 	var needInherit = isFunction(superClass);
 	klass.prototype = needInherit ? new superClass() : klass.prototype;
-	Object.defineProperty(klass, "_super", {
-		configurable: false,
-		enumerable: false,
-		writable: false,
-		value: superClass
+	
+	Object.defineProperties(klass, {
+		// 添加父类，可以是null或者一个类
+		_super: {
+			configurable: false,
+			enumerable: false,
+			writable: false,
+			value: superClass
+		},
+		// 将原型对象的的constructor指回构造函数
+		constructor: {
+			configurable: false,
+			enumerable: false,
+			writable: false,
+			value: klass
+		},
+		// 用于添加类属性和方法的函数
+		classProps: {
+			configurable: false,
+			enumerable: false,
+			writable: false,
+			value: function (props) {
+				// props必须是obj
+				if (!isObject(props)) throw new TypeError("props must be a obj");
+				for (var key in props) {
+					Object.defineProperty(this, key, {
+						configurable: false,
+						enumerable: true,
+						writable: isFunction(props[key]) ? false : true,
+						value: props[key]
+					});
+				}
+				
+				return this;
+			}
+		}
 	});
 	
-	// 将原型的constructor指回构造函数
-	Object.defineProperty(klass.prototype, "constructor", {
-		configurable: false,
-		enumerable: false,
-		writable: false,
-		value: klass
-	});
-	
-	// 将方法导入klass的原型
+	// 将方法导入klass的原型对象中
 	for (var key in props) {
 		// init 不可枚举，不能删除，不能更改
 		Object.defineProperty(klass.prototype, key, {
@@ -79,32 +102,10 @@ function defineClass (className, superClass, props) {
 		});
 	}
 	
-	// 添加类属性和方法
-	Object.defineProperty(klass, "classProps", {
-		configurable: false,
-		enumerable: false,
-		writable: false,
-		value: function (props) {
-			// props必须是obj
-			if (!isObject(props)) throw new TypeError("props must be a obj");
-			for (var key in props) {
-				Object.defineProperty(this, key, {
-					configurable: false,
-					enumerable: true,
-					writable: isFunction(props[key]) ? false : true,
-					value: props[key]
-				});
-			}
-			
-			return this;
-		}
-	});
-	
 	return klass;
 }
 
-
-// unittest
+// unittest，单元测试。
 var log = console.log.bind(console);
 
 // 自定义的错误类型
