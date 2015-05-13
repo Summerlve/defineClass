@@ -14,7 +14,7 @@
 			assertTrue(true);	
 		})
 		.addTestCase("defineClass must be ok", function () {
-			var People = defineClass(null, {
+			var People = defineClass("People", null, {
 				init: function (name, age, sex) {
 					this.name = name;
 					this.age = age;
@@ -34,7 +34,7 @@
 			assertTrue(p.type === People);	
 		})
 		.addTestCase("props must be obj and must have init function, superClass must be null or class", function () {
-			var People = defineClass(null, {
+			var People = defineClass("People", null, {
 				init: function () {
 					
 				}
@@ -44,7 +44,7 @@
 			log(Object.prototype.toString.call(p.type));
 		})
 		.addTestCase("inherit must be ok", function () {
-			var People = defineClass(null, {
+			var People = defineClass("People", null, {
 					init: function (name, age, sex) {
 						this.name = name;
 						this.age = age;
@@ -59,7 +59,7 @@
 			var p = new People("zhanghao", 22, "male");
 			log(p.say());
 			
-			var Student = defineClass(People, {
+			var Student = defineClass("Student", People, {
 				init: function (name, age, sex, stuId) {
 					_super(Student, this).init(name, age, sex);
 					this.stuId = stuId;
@@ -71,17 +71,37 @@
 			
 			var s = new Student("xxx", 22, "male", "122222");
 			log(s.say());
-			
-			var zh = defineClass(Object, {
-				init: function () {
-					
+		})
+		.addTestCase("extend property", function () {
+			var People = defineClass("People", null, {
+				init: function (name, age) {
+					this.name = name;
+					this.age = age;
+				},
+				say: function () {
+					return this.name + this.age;
 				}
+			})
+			.classProps({
+				va: 1
 			});
+			log(new People("zhanghao", 22).say());
+			log(People.va);
+			for (var key in People) {
+				log(key);
+			}
 			
+			for (var key in new People("zhanghao", 22)) {
+				log(key);
+			}
+			log(new People("zhanghao", 22).type);
+			log(People.name);
+			log(new People("zhanghao", 22).type);
 		});
 		test.run();
 		
-		
+
+
 	</script>
 </body>
 </html>

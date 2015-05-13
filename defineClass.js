@@ -7,38 +7,55 @@ types.forEach(function (value) {
 
 // defineClass
 // 返回父类的构造函数
-function _super (klass, scope) {
+function _super (klass, that) {
 	return {
-		init: klass._super.prototype.init.bind(scope)
+		init: klass._super.prototype.init.bind(that)
 	};
 }
 
-function defineClass (superClass, props) {
+function defineClass (className, superClass, props) {
 	// 在这个体系内，继承只支持单重继承，单继承，不包括自带的类。
 	if (superClass !== null && superClass._super) throw new Error("继承只支持单重继承，单继承");
-	// superClass为可选项，值为null或者一个类
+	// superClass为可选项，值为null或者一个类(function)
 	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass is opptional, if the class dont inherit any superclass, must choose null here");
 	// props必须是obj
 	if (!isObject(props)) throw new TypeError("props must be a obj");
 	// props必须包含init函数
 	if (isObject(props) && isUndefined(props.init)) throw new Error("must have a init function"); 
 	
-	function klass () {
-		// 安全的构造函数
-		if (!(this instanceof klass)) throw new Error("use 'new' keyword to create instance");
-		// type 不能删除，不能更改，可以枚举
-		Object.defineProperty(this, "type", {
-			configurable: false,
-			enumerable: true,
-			writable: false,
-			value: klass
-		});
-		
-		this.init.apply(this, arguments);
-	};
+	// 邪恶的eval，等同于下面注释的函数。
+	var klassString = [];
+	klassString.push("(function ");
+	klassString.push(className);
+	klassString.push(" () {\r\n");
+	klassString.push("// 安全的构造函数\r\n");
+	klassString.push("if (!(this instanceof klass)) throw new Error(\"use 'new' keyword to create instance\");\r\n");
+	klassString.push("// type 不能删除，不能更改，可以枚举\r\n");
+	klassString.push("Object.defineProperty(this, \"type\", {");
+	klassString.push("configurable: false,");
+	klassString.push("enumerable: true,");
+	klassString.push("writable: false,");
+	klassString.push("value: " + className);
+	klassString.push("});\r\n");
+	klassString.push("this.init.apply(this, arguments);})");
+	var klass = eval(klassString.join(""));
+	
+//	function klass () {
+//		// 安全的构造函数
+//		if (!(this instanceof klass)) throw new Error("use 'new' keyword to create instance");
+//		// type 不能删除，不能更改，可以枚举
+//		Object.defineProperty(this, "type", {
+//			configurable: false,
+//			enumerable: true,
+//			writable: false,
+//			value: klass
+//		});
+//		
+//		this.init.apply(this, arguments);
+//	}
 	
 	// 判断是否有需要继承
-	if (typeof superClass === "function") {
+	if (isFunction(superClass)) {
 		klass.prototype = new superClass();
 		Object.defineProperty(klass, "_super", {
 			configurable: false,
@@ -90,7 +107,7 @@ function defineClass (superClass, props) {
 		writable: false,
 		value: function (props) {
 			// props必须是obj
-			if (!(props instanceof Object)) throw new TypeError("props must be a obj");
+			if (!isObject(props)) throw new TypeError("props must be a obj");
 			for (var key in props) {
 				Object.defineProperty(this, key, {
 					configurable: false,
@@ -112,21 +129,21 @@ function defineClass (superClass, props) {
 var log = console.log.bind(console);
 
 // 自定义的错误类型
-var EqualsError = defineClass(Error, {
+var EqualsError = defineClass("EqualsError", Error, {
 	init: function (message) {
 		this.name = "EqualsError";
 		this.message = message;
 	}
 });
 
-var BooleanError = defineClass(Error, {
+var BooleanError = defineClass("BooleanError", Error, {
 	init: function (message) {
 		this.name = "BooleanError";
 		this.message = message;
 	}
 });
 
-var ErrorTypeError = defineClass(Error, {
+var ErrorTypeError = defineClass("ErrorTypeError", Error, {
 	init: function (message) {
 		this.name = "ErrorTypeError";
 		this.message = message;
@@ -152,7 +169,7 @@ function assertErrorType (errorType, fn){
 }
 
 // 单元测试类
-var unittest = defineClass(null, {
+var unittest = defineClass("unittest", null, {
 	init: function () {
 		this.passed = 0;
 		this.failed = 0;
@@ -234,14 +251,14 @@ var unittest = defineClass(null, {
 });
 
 // 简单的Stack和Queue实现
-var Node = defineClass(null, {
+var Node = defineClass("Node", null, {
 	init: function (item) {
 		this.item = item;
 		this.next = null;
 	}
 });
 
-var Stack = defineClass(null, {
+var Stack = defineClass("Stack", null, {
 	init: function () {
 		this.first = null;
 		this.N = 0;
@@ -276,7 +293,7 @@ var Stack = defineClass(null, {
 	}
 });
 
-var Queue = defineClass(null, {
+var Queue = defineClass("Queue", null, {
 	init: function () {
 		this.first = null;
 		this.last = null;
