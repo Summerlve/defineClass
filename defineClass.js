@@ -153,13 +153,13 @@ var unittest = defineClass("unittest", null, {
 	init: function () {
 		this.passed = 0;
 		this.failed = 0;
-		this.save = [];
+		this.testCases = new Queue();
 	},
 	addTestCase: function (name, fn) {
 		if (!isFunction(fn)) throw new TypeError("fn must be a function");
-		this.save.push({
+		this.testCases.enqueue({
 			name: name,
-			fn: fn
+			fn: fn,
 		});
 		
 		return this;
@@ -186,8 +186,11 @@ var unittest = defineClass("unittest", null, {
 		var start = Date.parse(new Date());
 		var fragment = document.createDocumentFragment();
 		
-		this.save.forEach(function (cur, index, arr) {
+		// 运行所有的testCase
+		var index = 1;
+		this.testCases.foreach(function (cur) {
 			fragment.appendChild(this.runTestCase(index, cur.name, cur.fn));
+			++ index;
 		}, this);
 		document.body.appendChild(fragment);
 
@@ -227,7 +230,7 @@ var unittest = defineClass("unittest", null, {
 		
 		finallyResults.appendChild(fragment);
 		document.body.appendChild(finallyResults);
-		this.save = null;
+		this.testCases = null;
 	}
 });
 
@@ -264,11 +267,11 @@ var Stack = defineClass("Stack", null, {
 		-- this.N;
 		return item;
 	},
-	foreach: function (fn) {
+	foreach: function (fn, that) {
 		if (this.isEmpty()) throw "Stack为空";
 		var cur = this.first;
 		while (cur !== null) {
-			fn.call(null, cur.item);
+			fn.call(that, cur.item);
 			cur = cur.next;
 		}
 	}
@@ -305,11 +308,11 @@ var Queue = defineClass("Queue", null, {
 		-- this.N;
 		return item;
 	},
-	foreach: function (fn) {
+	foreach: function (fn, that) {
 		if (this.isEmpty()) throw new Error("Queue为空"); 
 		var cur = this.first;
 		while (cur !== null) {
-			fn.call(null, cur.item);
+			fn.call(that, cur.item);
 			cur = cur.next;
 		}
 	}
