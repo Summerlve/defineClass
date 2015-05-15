@@ -106,7 +106,7 @@ function defineClass (className, superClass, props) {
 }
 
 // unittest，单元测试。
-var log = console.log.bind(console);
+var log = console !== null && isFunction(console.log) ? console.log.bind(console) : void 0;
 
 // 自定义的错误类型
 var EqualsError = defineClass("EqualsError", Error, {
@@ -317,7 +317,7 @@ var Queue = defineClass("Queue", null, {
 		}
 	}
 });
-
+	
 
 
 
