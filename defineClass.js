@@ -16,8 +16,11 @@ function _super (klass, that) {
 function defineClass (className, superClass, props) {
 	// className必须是String
 	if (!isString(className)) throw new TypeError("className must be string");
+	
+	// TO-DO 单重继承，待议。
 	// 在这个体系内，继承只支持单重继承，单继承，不包括自带的类。
-	if (superClass !== null && superClass._super) throw new Error("继承只支持单重继承，单继承");
+	// if (superClass !== null && superClass._super) throw new Error("继承只支持单重继承，单继承");
+	
 	// superClass为可选项，值为null或者一个类(function)
 	if (superClass !== null && typeof superClass !== "function") throw new TypeError("superClass is opptional, if the class dont inherit any superclass, must choose null here");
 	// props必须是obj
@@ -139,7 +142,7 @@ function assertEquals (a, b) {
 	if (a !== b) throw new EqualsError(a + "(" + typeof a + ")" + " isn't equals to " + b + "(" + typeof b + ")");
 };
 
-// assertErrorType为草稿，待议。
+// TO-DO assertErrorType为草稿，待议。
 function assertErrorType (errorType, fn){
 	try {
 		fn();

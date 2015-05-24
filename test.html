@@ -113,8 +113,25 @@
 			log(People.name);
 		})
 		.addTestCase("qipa de api test", function () {
+			var A = defineClass("A", null, {
+				init: function () {}
+			});
 			
+			var B = defineClass("B", A, {
+				init: function () {}
+			});
 			
+			var C = defineClass("C", B, {
+				init: function () {}
+			});
+			
+			var a = new A();
+			log(a.constructor); // A
+			var b = new B(); 
+			log(b.constructor); // A
+			var c = new C(); 
+			log(c.constructor); // A
+			log(C.prototype.constructor); // A
 		});
 		test.run();
 		
