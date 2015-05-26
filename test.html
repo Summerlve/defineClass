@@ -135,6 +135,20 @@
 		});
 		test.run();
 		
+		
+		function ten2two(num) {
+			var quotient = num;
+			var remainder = [];
+			while (quotient !== 0) {
+				quotient = Math.floor(num / 2);
+				remainder.push(num - 2 * quotient);
+				num = quotient;
+			}
+			
+			return remainder.reverse().join("");
+		}
+		
+		log(ten2two(3));
 	</script>
 </body>
 </html>
