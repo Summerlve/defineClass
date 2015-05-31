@@ -7,7 +7,7 @@
 	<script src="defineClass.js"></script>
 	<script>
 		"use strict";
-		var test = new unittest();
+		var test = new UnitTest();
 		//unittest本身的测试
 		test.addTestCase("every error must be ok", function () {
 			assertEquals(1, 1);
@@ -132,23 +132,41 @@
 			var c = new C(); 
 			log(c.constructor); // A
 			log(C.prototype.constructor); // A
+		})
+		.addTestCase("fuck the js's instance constructor prop", function () {
+			function A () {}
+			function B () {}
+			B.prototype = new A();
+			var a = new A();
+			var b = new B();
+			log(B.prototype.constructor); // A
+			log(a.constructor); // A
+			log(b.constructor); // A
+			log(a.hasOwnProperty("constructor"));
+			log(A.prototype.hasOwnProperty("constructor"));
+		})
+		.addTestCase("type and constructor must be ok", function () { 
+			var A = defineClass("A", null, {
+				init: function () {
+					
+				}
+			});
+			
+			var B = defineClass("B", A, {
+				init: function () {
+					
+				}
+			});
+			
+			var a = new A();
+			var b = new B();
+			assertEquals(a.constructor, A);
+			assertEquals(A.prototype.constructor, A);
+			assertEquals(b.constructor, B);
+			assertEquals(B.prototype.constructor, B);
 		});
 		test.run();
 		
-		
-		function ten2two(num) {
-			var quotient = num;
-			var remainder = [];
-			while (quotient !== 0) {
-				quotient = Math.floor(num / 2);
-				remainder.push(num - 2 * quotient);
-				num = quotient;
-			}
-			
-			return remainder.reverse().join("");
-		}
-		
-		log(ten2two(3));
 	</script>
 </body>
 </html>

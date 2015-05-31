@@ -65,13 +65,6 @@ function defineClass (className, superClass, props) {
 			writable: false,
 			value: superClass
 		},
-		// 将原型对象的的constructor指回构造函数
-		constructor: {
-			configurable: false,
-			enumerable: false,
-			writable: false,
-			value: klass
-		},
 		// 用于添加类属性和方法的函数
 		classProps: {
 			configurable: false,
@@ -91,6 +84,16 @@ function defineClass (className, superClass, props) {
 				
 				return this;
 			}
+		}
+	});
+	
+	Object.defineProperties(klass.prototype, {
+		// 将原型对象的constructor指回构造函数
+		constructor: {
+			configurable: false,
+			enumerable: false,
+			writable: true,
+			value: klass
 		}
 	});
 	
@@ -152,7 +155,7 @@ function assertErrorType (errorType, fn){
 }
 
 // 单元测试类
-var unittest = defineClass("unittest", null, {
+var UnitTest = defineClass("UnitTest", null, {
 	init: function () {
 		this.passed = 0;
 		this.failed = 0;
@@ -320,6 +323,25 @@ var Queue = defineClass("Queue", null, {
 		}
 	}
 });
+
+// 十进制数转换成二进制数
+function ten2two(num) {
+	var quotient = num;
+	var remainder = [];
+	while (quotient !== 0) {
+		quotient = Math.floor(num / 2);
+		remainder.push(num - 2 * quotient);
+		num = quotient;
+	}
+	
+	var result = "";	
+	while (remainder.length > 0) {
+		result += remainder.pop();
+	}
+	return result;
+}
+		
+
 	
 
 
