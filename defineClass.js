@@ -92,7 +92,7 @@ function defineClass (className, superClass, props) {
 		constructor: {
 			configurable: false,
 			enumerable: false,
-			writable: true,
+			writable: false,
 			value: klass
 		}
 	});
