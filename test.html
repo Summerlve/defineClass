@@ -164,6 +164,23 @@
 			assertEquals(A.prototype.constructor, A);
 			assertEquals(b.constructor, B);
 			assertEquals(B.prototype.constructor, B);
+		})
+		.addTestCase("public is default, private is _xxx", function () {
+			var People = defineClass("A", null, { 
+				init: function (name, age) {
+					this._name = name;
+					this._age = age;
+				},
+				getName: function () {
+					return this._name;
+				},
+				setName: function (name) {
+					this._name = name;
+				}
+			});
+			
+			var p = new People("zhanghao", 22);
+			log(p.getName());
 		});
 		test.run();
 		
